@@ -1,0 +1,97 @@
+Table pattern {
+  id uuid
+  dateCreated datetime
+  dateUpdated datetime
+  name string
+  description string
+  width int [note: "number of stitches per row"]
+  headerWidth int [null, note: "width of the header, or null if no header"]
+  footerWidth int [null, note: "width of the footer, or null if no footer"]
+  height int
+}
+
+Table patternStitch {
+  id uuid
+  patternId uuid
+  location enum("body", "header", "footer")
+  x int
+  y int
+  stitchTypeId uuid
+  colorIndex int
+}
+Ref: patternStitch.patternId - pattern.id
+Ref: patternStitch.stitchTypeId - stitchType.id
+
+Table stitchType {
+  id uuid
+  name string [note: "stitch name, like 'knit', 'yarn over', 'increase', etc"]
+  abbreviation string [note: "'K', 'M2I', etc, used for generating instructions"]
+  symbolImage string [note: "for representing this stitch in patterns"]
+  reverseStitchId uuid [null, note: "the reverse of this stitch, or undefined if that stitch doesn't exist."]
+  width int [note: "number of stitches wide this is. Like a 'knit' has width 1, an 'RC' has width 2, etc"]
+}
+Ref: stitchType.reverseStitchId - stitchType.id
+
+Table patternColor {
+  id uuid
+  patternId uuid
+  colorIndex int
+  colorId uuid
+}
+Ref: patternColor.patternId - pattern.id
+Ref: patternColor.colorId - color.id
+
+Table color {
+  id uuid
+  name string [note: "for example 'mint', 'willow green', 'fern', etc"]
+  hex string [note: "hex rgb representation of the color, for displaying the color digitally"]
+}
+
+// FUTURE PASS: Swatch photos.
+Table patternImage [note: "For a later pass: Swatch photos"] {
+  id uuid
+  patternId uuid
+  imagePath string
+  materialId uuid
+  colorId uuid
+}
+Ref: patternImage.patternId - pattern.id
+Ref: patternImage.materialId - material.id
+
+Table material [note: "For a later pass: Swatch photos"] {
+  id uuid
+  name string
+}
+
+// FUTURE PASS: Tagging.
+Table patternTag [note: "For a later pass: Tagging"] {
+  id uuid
+  patternId uuid
+  tagId uuid
+}
+Ref: patternTag.patternId - pattern.id
+Ref: patternTag.tagId - tag.id
+
+Table tag [note: "For a later pass: Tagging"] {
+  id uuid
+  name string
+  description string
+}
+
+// FUTURE PASS: Book citations.
+Table patternCitation [note: "For a later pass: Book citations"] {
+  id uuid
+  patternId uuid
+  bookId uuid
+  page int
+  alias string [note: "name of this pattern according to the book"]
+}
+Ref: patternCitation.patternId - pattern.id
+Ref: patternCitation.bookId - book.id
+
+Table book [note: "For a later pass: Citations"] {
+  id uuid
+  title name
+  cover string
+  // etc...
+}
